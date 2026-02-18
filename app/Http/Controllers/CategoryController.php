@@ -33,7 +33,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
         Category::create([
@@ -64,6 +64,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name'
+        ]);
         $category->update($request->all());
         return redirect()->route('categories.index');
     }
@@ -71,9 +74,13 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $categories)
+    public function destroy(Category $category)
     {
-        $categories->delete();
-        return redirect()->route('categoriess.index');
+        if ($category->posts->count() > 0) {
+            return redirect()->route('categories.index')
+                ->with('error', 'No puedes borrar esta categoría porque tiene ' . $category->posts->count() . ' posts asociados.');
+        }
+        $category->delete();
+        return redirect()->route('categories.index');
     }
 }
