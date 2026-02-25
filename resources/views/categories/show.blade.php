@@ -14,4 +14,5 @@
         <button type="submit">Eliminar</button>
 
     </form>
+
 </x-layout>

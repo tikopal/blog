@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post_tag extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostTagFactory> */
     use HasFactory;
+
+    protected $table = 'post_tags';
+
+    protected $fillable = ['post_id', 'tag_id'];
+
     public function post()
     {
         return $this->belongsTo(Post::class);

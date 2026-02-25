@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Post_tag;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -32,7 +33,17 @@ class PostController extends Controller
      */
     public function store(PostRequest $request)
     {
-        Post::create($request->validated());
+        $post = Post::create($request->validated());
+
+        if ($request->has('tags')) {
+            foreach ($request->tags as $tag_id) {
+                Post_tag::create([
+                    'post_id' => $post->id,
+                    'tag_id'  => $tag_id
+                ]);
+            }
+        }
+
         return redirect()->route('posts.index')->with('success', 'Post creado correctamente');
     }
 
