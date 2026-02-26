@@ -76,7 +76,14 @@
                     Active
                 </label>
         </div>
-
+<select name="tags[]" multiple>
+    @foreach($tags as $tag)
+        <option value="{{ $tag->id }}"
+            {{ isset($post) && $post->tags->contains($tag->id) ? 'selected' : '' }}>
+            {{ $tag->name }}
+        </option>
+    @endforeach
+</select>
         <button type="submit">Create</button>
 
     </form>

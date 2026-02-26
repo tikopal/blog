@@ -6,6 +6,7 @@ use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
@@ -14,6 +15,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        Gate::authorize('admin');
         $categories = Category::latest()->paginate(10);
         return view('categories.index', compact('categories'));
     }
@@ -23,7 +25,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        Gate::authorize('admin');
         $categories = Category::all();
+
         return view('categories.create', compact('categories'));
     }
 
@@ -32,8 +36,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize('admin');
         $request->validate([
-            'name' => 'required|string|max:255|.',
+            'name' => 'required|string|max:255',
         ]);
 
         Category::create([
@@ -56,6 +61,7 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        Gate::authorize('admin');
         return view('categories.edit', compact('category'));
     }
 
@@ -64,6 +70,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
+        Gate::authorize('admin');
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name'
         ]);
@@ -76,6 +83,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        Gate::authorize('admin');
         if ($category->posts->count() > 0) {
             return redirect()->route('categories.index')
                 ->with('error', 'No puedes borrar esta categoría porque tiene ' . $category->posts->count() . ' posts asociados.');

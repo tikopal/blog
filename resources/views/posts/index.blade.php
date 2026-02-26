@@ -1,13 +1,14 @@
 <x-layout>
-    <a href="{{route('posts.create')}}">Crear post</a>
-    <h1>Vista index</h1>
+    @auth
+        <a href="{{ route('posts.create') }}">Crear post</a>
+    @endauth
 
+    <h1>Vista index</h1>
     <ul>
         @foreach ($posts as $post)
-            <li><a href="{{route('posts.show', $post)}}">
-                {{$post->title}}    
-            </a></li>
+            <li><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></li>
         @endforeach
     </ul>
-    {{$posts->links()}}
+
+    {{ $posts->links() }}
 </x-layout>

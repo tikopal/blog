@@ -6,7 +6,10 @@ use App\Http\Requests\PostRequest;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Post_tag;
+use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -25,7 +28,8 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('posts.create', compact('categories'));
+        $tags = Tag::all();
+        return view('posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -33,7 +37,10 @@ class PostController extends Controller
      */
     public function store(PostRequest $request)
     {
-        $post = Post::create($request->validated());
+        $data = $request->validated();
+        $data['user_id'] = Auth::id();
+
+        $post = Post::create($data);
 
         if ($request->has('tags')) {
             foreach ($request->tags as $tag_id) {
@@ -52,16 +59,20 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        $post->load('tags', 'comments');
         return view('posts.show', compact('post'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
+
     public function edit(Post $post)
     {
+        Gate::authorize('admin');
         $categories = Category::all();
-        return view('posts.edit', compact('post', 'categories'));
+        $tags = Tag::all();
+        return view('posts.edit', compact('post', 'categories', 'tags'));
     }
 
     /**
@@ -69,15 +80,30 @@ class PostController extends Controller
      */
     public function update(PostRequest $request, Post $post)
     {
-        $post->update($request->all());
-        return redirect()->route('posts.index');
+        Gate::authorize('admin');
+        $post->update($request->validated());
+
+        if ($request->has('tags')) {
+            Post_tag::where('post_id', $post->id)->delete();
+
+            foreach ($request->tags as $tag_id) {
+                Post_tag::create([
+                    'post_id' => $post->id,
+                    'tag_id'  => $tag_id
+                ]);
+            }
+        }
+
+        return redirect()->route('posts.index')->with('success', 'Post actualizado');
     }
 
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy(Post $post)
     {
+        Gate::authorize('admin');
         $post->delete();
         return redirect()->route('posts.index');
     }

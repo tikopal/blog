@@ -9,7 +9,7 @@ class Post extends Model
 {
     /** @use HasFactory<\Database\Factories\PostFactory> */
     use HasFactory;
-    protected $fillable = ['title', 'body', 'category_id', 'slug', 'extract', 'image_path'];
+    protected $fillable = ['title', 'body', 'category_id', 'slug', 'extract', 'image_path', 'user_id'];
 
     public function category()
     {
@@ -21,7 +21,7 @@ class Post extends Model
     }
     public function tags()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'post_tags');
     }
     public function comments()
     {

@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('extract');
             $table->text('body');
-            $table->string('image_path');
-            $table->boolean('is_published');
-            $table->date('published_at');
+            $table->string('image_path')->nullable()->change();
+            $table->boolean('is_published')->default(false)->change();
+            $table->timestamp('published_at')->nullable()->change();
             $table->timestamps();
         });
     }
